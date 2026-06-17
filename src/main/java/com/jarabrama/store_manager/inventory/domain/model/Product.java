@@ -47,7 +47,7 @@ public class Product {
         "El nombre de un producto no puede tener mas de 50 caracteres"
       );
     }
-    if (description.length() > 100) {
+    if (description != null && description.length() > 100) {
       throw new InvalidProductException(
         "La descripcion de un producto no puede tener mas de 200 caracteres"
       );
