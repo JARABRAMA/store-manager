@@ -18,4 +18,6 @@ public interface ProductRepository {
   );
 
   Optional<Product> findById(UUID id);
+
+  boolean existsByNameWithDifferentId(String name, UUID id);
 }

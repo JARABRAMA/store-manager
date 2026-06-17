@@ -11,6 +11,8 @@ import com.jarabrama.store_manager.inventory.infraestructure.persistence.jpa.Cat
 import com.jarabrama.store_manager.inventory.infraestructure.persistence.jpa.ProductJpaRepo;
 import com.jarabrama.store_manager.inventory.infraestructure.ports.out.ProductRepository;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -82,5 +84,15 @@ public class ProductRepositoryImpl implements ProductRepository {
       .last(page.isLast())
       .first(page.isFirst())
       .build();
+  }
+
+  @Override
+  public Optional<Product> findById(UUID id) {
+    return productRepo.findById(id).map(productMapper::toDomain);
+  }
+
+  @Override
+  public boolean existsByNameWithDifferentId(String name, UUID id) {
+    return productRepo.existsByNameWithDifferentId(name, id);
   }
 }
