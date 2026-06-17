@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class UpdateProductRequestTest {
+public class UpdateProductRequestMapperTest {
 
   private UpdateProductRequestMapper mapper;
 
@@ -24,7 +24,7 @@ public class UpdateProductRequestTest {
       .name("Product 1")
       .description("description of product 1")
       .stock(1)
-      .price(3_900)
+      .price(Double.valueOf(3_900))
       .imageUrl("http://imageurl")
       .categories(categories)
       .build();
@@ -48,7 +48,7 @@ public class UpdateProductRequestTest {
     var req = UpdateProductRequest.builder()
       .name("Product 1")
       .stock(1)
-      .price(3_900)
+      .price(Double.valueOf(3_900))
       .categories(categories)
       .build();
 
