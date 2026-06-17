@@ -96,4 +96,15 @@ public class ProductTest {
       "El precio del producto debe ser mayor a cero"
     );
   }
+
+  @Test
+  void validateProductWithNoDescription() {
+    var product = Product.builder()
+      .price(90_000)
+      .stock(8)
+      .name("My Product")
+      .build();
+
+    product.validate(); // should not fail
+  }
 }
