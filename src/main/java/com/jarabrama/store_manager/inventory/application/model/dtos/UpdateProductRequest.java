@@ -22,12 +22,12 @@ public record UpdateProductRequest(
   @PositiveOrZero(
     message = "El precio de un producto debe ser mayor o igual a cero"
   )
-  double price,
+  Double price,
 
   @PositiveOrZero(
     message = "Las unidades disponibles deben ser mayor o igual a cero"
   )
-  int stock,
+  Integer stock,
 
   String imageUrl,
   List<String> categories
