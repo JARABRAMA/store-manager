@@ -147,10 +147,7 @@ public class ProductServiceTest {
   void findProductWithNullSearchValues() {
     var uuid = UUID.randomUUID();
     List<Product> products = List.of(
-      Product.builder()
-        .name(("producto 1"))
-        .id(uuid)
-        .build()
+      Product.builder().name("producto 1").id(uuid).build()
     );
     var domainPage = DomainPage.<Product>builder()
       .page(0)
@@ -187,10 +184,7 @@ public class ProductServiceTest {
   void findProductsWithNotNullValues() {
     var uuid = UUID.randomUUID();
     List<Product> products = List.of(
-      Product.builder()
-        .name(("producto 1"))
-        .id(uuid)
-        .build()
+      Product.builder().name("producto 1").id(uuid).build()
     );
     var domainPage = DomainPage.<Product>builder()
       .page(0)
@@ -341,5 +335,31 @@ public class ProductServiceTest {
     verify(productRepo).existsByNameWithDifferentId(product.name(), id);
     verify(productRepo).findById(any());
     verify(categoryRepository).saveAll(categories);
+  }
+
+  @Test
+  void findByIdReturnsOptionalEmtpy() {
+    when(productRepo.findById(any())).thenReturn(Optional.empty());
+
+    assertThrows(InvalidProductException.class, () ->
+      productService.findById(UUID.randomUUID())
+    );
+  }
+
+  @Test
+  void findByIdReturnsObject() {
+    var id = UUID.randomUUID();
+    var product = Product.builder()
+      .id(id)
+      .name("Product 1")
+      .stock(1)
+      .price(4500)
+      .build();
+    var expected = productResponseMapper.fromDomain(product);
+    when(productRepo.findById(id)).thenReturn(Optional.of(product));
+
+    var actual = productService.findById(id);
+
+    assertEquals(expected, actual);
   }
 }

@@ -6,10 +6,12 @@ import com.jarabrama.store_manager.inventory.application.model.dtos.ProductRespo
 import com.jarabrama.store_manager.inventory.application.model.dtos.SimpleResponse;
 import com.jarabrama.store_manager.inventory.application.ports.in.ProductUseCase;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,5 +48,10 @@ public class ProductController {
   @GetMapping("/categories")
   public ResponseEntity<List<String>> findAllCategories() {
     return ResponseEntity.ok(productService.fetchAllCategories());
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<ProductResponse> findById(@PathVariable("id") UUID id) {
+    return ResponseEntity.ok(productService.findById(id));
   }
 }

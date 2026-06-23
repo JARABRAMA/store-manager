@@ -5,6 +5,7 @@ import com.jarabrama.store_manager.inventory.application.model.dtos.PageResponse
 import com.jarabrama.store_manager.inventory.application.model.dtos.ProductResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.UpdateProductRequest;
 import java.util.List;
+import java.util.UUID;
 
 public interface ProductUseCase {
   void saveProduct(CreateProductRequest req);
@@ -18,4 +19,6 @@ public interface ProductUseCase {
   void updateProduct(String id, UpdateProductRequest req);
 
   List<String> fetchAllCategories();
+
+  ProductResponse findById(UUID id);
 }

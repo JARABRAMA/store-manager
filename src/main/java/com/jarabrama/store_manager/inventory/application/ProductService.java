@@ -167,4 +167,13 @@ public class ProductService implements ProductUseCase {
   public List<String> fetchAllCategories() {
     return categoryRepository.findAll();
   }
+
+  @Override
+  public ProductResponse findById(UUID id) {
+    var product = productRepo.findById(id);
+    if (product.isEmpty()) {
+      throw new InvalidProductException("Producto no encontrado en el sistema");
+    }
+    return productResponseMapper.fromDomain(product.get());
+  }
 }
