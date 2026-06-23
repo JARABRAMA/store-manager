@@ -332,13 +332,15 @@ public class ProductServiceTest {
       Optional.<Product>of(productPersisted)
     );
 
+    productService.updateProduct(id.toString(), product);
+
     verify(productRepo).existsByNameWithDifferentId(product.name(), id);
     verify(productRepo).findById(any());
     verify(categoryRepository).saveAll(categories);
   }
 
   @Test
-  void findByIdReturnsOptionalEmtpy() {
+  void findByIdReturnsOptionalEmpty() {
     when(productRepo.findById(any())).thenReturn(Optional.empty());
 
     assertThrows(InvalidProductException.class, () ->
