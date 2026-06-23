@@ -5,4 +5,5 @@ import java.util.List;
 public interface CategoryRepository {
   boolean alreadyExists(String name);
   void saveAll(List<String> categories);
+  List<String> findAll();
 }

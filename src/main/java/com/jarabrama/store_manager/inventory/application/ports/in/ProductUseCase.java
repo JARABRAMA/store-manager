@@ -4,6 +4,7 @@ import com.jarabrama.store_manager.inventory.application.model.dtos.CreateProduc
 import com.jarabrama.store_manager.inventory.application.model.dtos.PageResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.ProductResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.UpdateProductRequest;
+import java.util.List;
 
 public interface ProductUseCase {
   void saveProduct(CreateProductRequest req);
@@ -15,4 +16,6 @@ public interface ProductUseCase {
   );
 
   void updateProduct(String id, UpdateProductRequest req);
+
+  List<String> fetchAllCategories();
 }

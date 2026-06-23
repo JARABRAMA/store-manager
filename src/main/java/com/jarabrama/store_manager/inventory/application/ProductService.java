@@ -3,8 +3,10 @@ package com.jarabrama.store_manager.inventory.application;
 import com.jarabrama.store_manager.inventory.application.model.dtos.CreateProductRequest;
 import com.jarabrama.store_manager.inventory.application.model.dtos.PageResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.ProductResponse;
+import com.jarabrama.store_manager.inventory.application.model.dtos.UpdateProductRequest;
 import com.jarabrama.store_manager.inventory.application.model.mappers.CreateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.application.model.mappers.ProductResponseMapper;
+import com.jarabrama.store_manager.inventory.application.model.mappers.UpdateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.application.ports.in.ProductUseCase;
 import com.jarabrama.store_manager.inventory.domain.exceptions.InvalidProductException;
 import com.jarabrama.store_manager.inventory.domain.model.DomainPage;
@@ -14,11 +16,13 @@ import com.jarabrama.store_manager.inventory.infraestructure.ports.out.ProductRe
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService implements ProductUseCase {
 
   private final ProductRepository productRepo;
@@ -26,6 +30,7 @@ public class ProductService implements ProductUseCase {
 
   private final CreateProductRequestMapper createProductRequestMapper;
   private final ProductResponseMapper productResponseMapper;
+  private final UpdateProductRequestMapper updateProductRequestMapper;
 
   @Override
   @Transactional
@@ -93,5 +98,75 @@ public class ProductService implements ProductUseCase {
       .first(products.first())
       .last(products.last())
       .build();
+  }
+
+  @Override
+  @Transactional
+  public void updateProduct(String id, UpdateProductRequest req) {
+    var uuid = createAndValidateUUIDFromString(id);
+
+    if (productRepo.existsByNameWithDifferentId(req.name(), uuid)) {
+      throw new InvalidProductException(
+        "Ya existe otro producto con ese nombre"
+      );
+    }
+
+    var persistedProduct = getProduct(uuid);
+    persistedProduct = updateProductAttributes(req, persistedProduct);
+    persistedProduct.validate();
+
+    var notAlreadyCreatedCategories = filterNew(req.categories());
+    if (!notAlreadyCreatedCategories.isEmpty()) {
+      categoryRepository.saveAll(notAlreadyCreatedCategories);
+    }
+
+    productRepo.save(persistedProduct);
+  }
+
+  private Product updateProductAttributes(
+    UpdateProductRequest req,
+    Product persistedProduct
+  ) {
+    if (req.name() != null) {
+      persistedProduct.setName(req.name());
+    }
+    if (req.description() != null) {
+      persistedProduct.setDescription(req.description());
+    }
+    if (req.stock() != null) {
+      persistedProduct.setStock(req.stock());
+    }
+    if (req.price() != null) {
+      persistedProduct.setPrice(req.price());
+    }
+    if (req.imageUrl() != null) {
+      persistedProduct.setImageUrl(req.imageUrl());
+    }
+    if (req.categories() != null) {
+      persistedProduct.setCategories(req.categories());
+    }
+    return persistedProduct;
+  }
+
+  private UUID createAndValidateUUIDFromString(String rawId) {
+    try {
+      return UUID.fromString(rawId);
+    } catch (IllegalArgumentException ex) {
+      log.error(ex.getMessage());
+      throw new InvalidProductException("El id de producto es invalido");
+    }
+  }
+
+  private Product getProduct(UUID id) {
+    return productRepo
+      .findById(id)
+      .orElseThrow(() ->
+        new InvalidProductException("El producto no existe en el sistema")
+      );
+  }
+
+  @Override
+  public List<String> fetchAllCategories() {
+    return categoryRepository.findAll();
   }
 }

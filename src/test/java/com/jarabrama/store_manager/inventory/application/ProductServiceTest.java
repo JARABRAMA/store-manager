@@ -7,14 +7,18 @@ import static org.mockito.Mockito.*;
 import com.jarabrama.store_manager.inventory.application.model.dtos.CreateProductRequest;
 import com.jarabrama.store_manager.inventory.application.model.dtos.PageResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.ProductResponse;
+import com.jarabrama.store_manager.inventory.application.model.dtos.UpdateProductRequest;
 import com.jarabrama.store_manager.inventory.application.model.mappers.CreateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.application.model.mappers.ProductResponseMapper;
+import com.jarabrama.store_manager.inventory.application.model.mappers.UpdateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.domain.exceptions.InvalidProductException;
 import com.jarabrama.store_manager.inventory.domain.model.DomainPage;
 import com.jarabrama.store_manager.inventory.domain.model.Product;
 import com.jarabrama.store_manager.inventory.infraestructure.ports.out.CategoryRepository;
 import com.jarabrama.store_manager.inventory.infraestructure.ports.out.ProductRepository;
+import jakarta.persistence.Id;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +39,9 @@ public class ProductServiceTest {
 
   @Spy
   private CreateProductRequestMapper createProductRequestMapper;
+
+  @Spy
+  private UpdateProductRequestMapper updateProductRequestMapper;
 
   @Spy
   private ProductResponseMapper productResponseMapper;
@@ -220,5 +227,119 @@ public class ProductServiceTest {
 
     verify(productRepo).findAll("producto", "categoria 1", 0, 10);
     assertEquals(expectedPageResponse, actualPageResponse);
+  }
+
+  @Test
+  void updateProductWithNameThatAlreadyExists() {
+    var uuid = UUID.randomUUID();
+    var product = UpdateProductRequest.builder().name("producto 1").build();
+
+    when(
+      productRepo.existsByNameWithDifferentId(product.name(), uuid)
+    ).thenReturn(true);
+
+    assertThrows(
+      InvalidProductException.class,
+      () -> productService.updateProduct(uuid.toString(), product),
+      "Ya existe otro producto con ese nombre"
+    );
+
+    verify(productRepo).existsByNameWithDifferentId(product.name(), uuid);
+  }
+
+  @Test
+  void updateProductWithMalformedId() {
+    var id = "malformed id";
+    var invalidProduct = UpdateProductRequest.builder()
+      .name("product 1")
+      .stock(40)
+      .build();
+
+    assertThrows(
+      InvalidProductException.class,
+      () -> productService.updateProduct(id, invalidProduct),
+      "El id de producto es invalido"
+    );
+
+    verify(productRepo, never()).existsByNameWithDifferentId(
+      anyString(),
+      any()
+    );
+  }
+
+  @Test
+  void updateProductWithInvalidAttributes() {
+    var id = UUID.randomUUID();
+    var invalidProduct = UpdateProductRequest.builder()
+      .name("name with more than 50 characters to make it fails")
+      .stock(-3)
+      .build(); // invalid negative stock
+
+    when(
+      productRepo.existsByNameWithDifferentId(invalidProduct.name(), id)
+    ).thenReturn(false);
+
+    assertThrows(InvalidProductException.class, () ->
+      productService.updateProduct(id.toString(), invalidProduct)
+    );
+
+    verify(productRepo).existsByNameWithDifferentId(invalidProduct.name(), id);
+  }
+
+  @Test
+  void updateProductWithIdThatDoesNotExists() {
+    var id = UUID.randomUUID();
+    var product = UpdateProductRequest.builder()
+      .name("product 1")
+      .stock(40)
+      .price(Double.valueOf(3_500))
+      .build();
+
+    when(
+      productRepo.existsByNameWithDifferentId(product.name(), id)
+    ).thenReturn(false);
+    when(productRepo.findById(id)).thenReturn(Optional.empty());
+
+    assertThrows(
+      InvalidProductException.class,
+      () -> productService.updateProduct(id.toString(), product),
+      "El producto no existe en el sistema"
+    );
+
+    verify(productRepo).existsByNameWithDifferentId(anyString(), any());
+    verify(productRepo).findById(any());
+  }
+
+  @Test
+  void updateProductWhitNonExistentCategories() {
+    var id = UUID.randomUUID();
+    var categories = List.of("category 1", "category 2");
+    var product = UpdateProductRequest.builder()
+      .name("product 1")
+      .description("description of the product")
+      .stock(40)
+      .price(Double.valueOf(3_500))
+      .categories(categories)
+      .build();
+
+    var productPersisted = Product.builder()
+      .name("product 1")
+      .description("description of the product")
+      .stock(40)
+      .price(3_500)
+      .categories(categories)
+      .build();
+
+    when(categoryRepository.alreadyExists(anyString())).thenReturn(false);
+    when(
+      productRepo.existsByNameWithDifferentId(product.name(), id)
+    ).thenReturn(false);
+    when(productRepo.findById(id)).thenReturn(
+      Optional.<Product>of(productPersisted)
+    );
+
+    verify(productRepo).existsByNameWithDifferentId(product.name(), id);
+    verify(productRepo).findById(any());
+    verify(categoryRepository).saveAll(categories);
   }
 }

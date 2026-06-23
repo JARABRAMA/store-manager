@@ -5,6 +5,7 @@ import com.jarabrama.store_manager.inventory.application.model.dtos.PageResponse
 import com.jarabrama.store_manager.inventory.application.model.dtos.ProductResponse;
 import com.jarabrama.store_manager.inventory.application.model.dtos.SimpleResponse;
 import com.jarabrama.store_manager.inventory.application.ports.in.ProductUseCase;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,5 +41,10 @@ public class ProductController {
     @RequestParam(required = false, defaultValue = "0") Integer page
   ) {
     return ResponseEntity.ok(productService.findProducts(text, category, page));
+  }
+
+  @GetMapping("/categories")
+  public ResponseEntity<List<String>> findAllCategories() {
+    return ResponseEntity.ok(productService.fetchAllCategories());
   }
 }

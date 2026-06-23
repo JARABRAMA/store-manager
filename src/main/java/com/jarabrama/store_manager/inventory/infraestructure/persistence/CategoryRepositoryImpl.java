@@ -28,4 +28,13 @@ public class CategoryRepositoryImpl implements CategoryRepository {
       .toList();
     categoryRepo.saveAll(categoryEntities);
   }
+
+  @Override
+  public List<String> findAll() {
+    return categoryRepo
+      .findAll()
+      .stream()
+      .map(c -> c.getName())
+      .toList();
+  }
 }
