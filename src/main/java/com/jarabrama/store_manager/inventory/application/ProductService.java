@@ -6,7 +6,6 @@ import com.jarabrama.store_manager.inventory.application.model.dtos.ProductRespo
 import com.jarabrama.store_manager.inventory.application.model.dtos.UpdateProductRequest;
 import com.jarabrama.store_manager.inventory.application.model.mappers.CreateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.application.model.mappers.ProductResponseMapper;
-import com.jarabrama.store_manager.inventory.application.model.mappers.UpdateProductRequestMapper;
 import com.jarabrama.store_manager.inventory.application.ports.in.ProductUseCase;
 import com.jarabrama.store_manager.inventory.domain.exceptions.InvalidProductException;
 import com.jarabrama.store_manager.inventory.domain.model.DomainPage;
@@ -30,7 +29,6 @@ public class ProductService implements ProductUseCase {
 
   private final CreateProductRequestMapper createProductRequestMapper;
   private final ProductResponseMapper productResponseMapper;
-  private final UpdateProductRequestMapper updateProductRequestMapper;
 
   @Override
   @Transactional
