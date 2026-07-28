@@ -65,6 +65,6 @@ public class ProductController {
     @RequestBody UpdateProductRequest product
   ) {
     productService.updateProduct(id, product);
-    return ResponseEntity.ok(new SimpleResponse("Producto actualizado correctamente"))
+    return ResponseEntity.ok(new SimpleResponse("Producto actualizado correctamente"));
   }
 }
