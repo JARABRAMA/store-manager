@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * SystemUseJpaRepository
  */
 
-public interface SystemUseJpaRepository
+public interface SystemUserJpaRepository
   extends JpaRepository<SystemUserEntity, UUID> {}
