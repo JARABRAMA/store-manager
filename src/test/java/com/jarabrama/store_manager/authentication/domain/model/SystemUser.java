@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Builder
 @Data
-class SystemUser {
+public class SystemUser {
   private UUID id;
   private String username;
   private String passwordHash;
