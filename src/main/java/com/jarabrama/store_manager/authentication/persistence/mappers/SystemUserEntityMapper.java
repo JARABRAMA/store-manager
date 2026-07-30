@@ -15,4 +15,13 @@ public class SystemUserEntityMapper {
             .passwordHash(domain.getPasswordHash())
             .build();
   }
+
+  public SystemUser toDomain(SystemUserEntity entity) {
+    return SystemUser.builder()
+            .id(entity.getId())
+            .username(entity.getUsername())
+            .role(entity.getRole())
+            .passwordHash(entity.getPasswordHash())
+            .build();
+  }
 }
