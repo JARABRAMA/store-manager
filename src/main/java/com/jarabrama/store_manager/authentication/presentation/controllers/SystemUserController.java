@@ -5,7 +5,6 @@ import com.jarabrama.store_manager.authentication.usecases.SaveUserUseCase;
 import com.jarabrama.store_manager.inventory.application.model.dtos.SimpleResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +20,6 @@ public class SystemUserController {
   @PostMapping()
   public ResponseEntity<SimpleResponse> save(@RequestBody NewUserRequest req) {
     var message = saveUserUseCase.execute(req);
-    return new ResponseEntity(new SimpleResponse(message), HttpStatus.CREATED);
+    return new ResponseEntity<>(new SimpleResponse(message), HttpStatus.CREATED);
   }
 }
