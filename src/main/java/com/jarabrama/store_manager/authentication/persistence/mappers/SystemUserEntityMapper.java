@@ -2,7 +2,9 @@ package com.jarabrama.store_manager.authentication.persistence.mappers;
 
 import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
 import com.jarabrama.store_manager.authentication.persistence.entities.SystemUserEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SystemUserEntityMapper {
 
   public SystemUserEntity fromDomain(SystemUser domain) {

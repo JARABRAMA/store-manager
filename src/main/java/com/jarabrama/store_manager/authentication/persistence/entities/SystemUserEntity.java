@@ -1,13 +1,11 @@
 package com.jarabrama.store_manager.authentication.persistence.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.util.UUID;
 
-import org.springframework.data.annotation.Id;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import com.jarabrama.store_manager.authentication.domain.model.SystemRole;
 
@@ -22,6 +20,8 @@ import lombok.Data;
 @Table(name = "system_users", schema = "authentication")
 @Builder
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SystemUserEntity {
 
   @Id
