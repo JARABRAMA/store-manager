@@ -5,6 +5,7 @@ import com.jarabrama.store_manager.authentication.domain.exceptions.DatabaseExce
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidNewUserException;
 import com.jarabrama.store_manager.authentication.domain.exceptions.UserAlreadyExistsException;
 import com.jarabrama.store_manager.authentication.domain.model.SystemRole;
+import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
 import com.jarabrama.store_manager.authentication.presentation.dto.NewUserRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,10 +16,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 class SaveUserUseCaseTest {
@@ -102,6 +104,26 @@ class SaveUserUseCaseTest {
     var request = new NewUserRequest("admin", "password");
     doThrow(new UserAlreadyExistsException("User already exists")).when(userRepository).save(any());
     Assertions.assertThrows(UserAlreadyExistsException.class, () -> saveUserUseCase.execute(request));
+  }
+
+  @Test
+  void validate_that_username_already_exists() {
+    var request = new NewUserRequest("admin", "password");
+    saveUserUseCase.execute(request);
+    verify(userRepository).findByUsername("admin");
+  }
+
+  @Test
+  void throws_user_already_exits_exception_when_user_actually_exits() {
+    var request = new NewUserRequest("admin", "password");
+    var userFounded = SystemUser.builder()
+            .username("admin")
+            .passwordHash("password")
+            .role(SystemRole.EMPLOYEE)
+            .build();
+    when(userRepository.findByUsername("admin")).thenReturn(Optional.of(userFounded));
+    var exception = Assertions.assertThrows(UserAlreadyExistsException.class, () -> saveUserUseCase.execute(request));
+    Assertions.assertEquals("El nombre de usuario ya existe", exception.getMessage());
   }
 
 }
