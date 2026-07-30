@@ -55,4 +55,25 @@ public class SystemUserEntityMapperTests {
     var actual = mapper.fromDomain(user);
     Assertions.assertEquals(expected, actual);
   }
+
+  @Test
+  void map_from_entity_to_domain() {
+    var id = UUID.randomUUID();
+    var entity = SystemUserEntity.builder()
+            .id(id)
+            .username("some username")
+            .role(SystemRole.ADMINISTRATOR)
+            .passwordHash("a password hash")
+            .build();
+
+    var expected = SystemUser.builder()
+            .id(id)
+            .username("some username")
+            .role(SystemRole.ADMINISTRATOR)
+            .passwordHash("a password hash")
+            .build();
+
+    var actual = mapper.toDomain(entity);
+    Assertions.assertEquals(expected, actual);
+  }
 }
