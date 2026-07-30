@@ -3,7 +3,6 @@ package com.jarabrama.store_manager.authentication.presentation.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jarabrama.store_manager.authentication.presentation.dto.NewUserRequest;
 import com.jarabrama.store_manager.authentication.usecases.SaveUserUseCase;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.junit.jupiter.api.MediaType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -12,7 +11,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
