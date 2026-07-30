@@ -24,10 +24,12 @@ public class SystemUserRepositoryImpl implements SystemUserRepositoryPort {
 
   @Override
   public Optional<SystemUser> findByUsername(String username) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException(
-            "Unimplemented method 'findByUsername'"
-    );
+    try {
+      return jpaRepository.findByUsername(username).map(mapper::toDomain);
+    } catch (RuntimeException e) {
+      log.error("user repository - find by username: {}", e.getMessage());
+      throw new DatabaseException("Error de base de datos");
+    }
   }
 
   @Override
