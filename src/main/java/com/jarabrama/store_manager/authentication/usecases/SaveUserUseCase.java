@@ -17,15 +17,9 @@ public class SaveUserUseCase {
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
   public String execute(NewUserRequest newUser) {
-    if (newUser.username().length() < 3) {
-      throw new InvalidNewUserException("El nombre de usuario debe tener al menos tres caracteres");
-    } else if (newUser.username().length() > 20) {
-      throw new InvalidNewUserException("El nombre de usuario no debe superar los 20 caracteres");
-    } else if (newUser.password().length() < 6) {
-      throw new InvalidNewUserException("La contraseña debe contener al menos 6 caracteres");
-    } else if (newUser.password().length() > 20) {
-      throw new InvalidNewUserException("La contraseña no puede superar los 20 caracteres");
-    }
+    validateUserName(newUser);
+    validateUserPassword(newUser);
+
     var passHash = bCryptPasswordEncoder.encode(newUser.password());
     var user = SystemUser.builder().role(SystemRole.EMPLOYEE)
             .username(newUser.username())
@@ -34,5 +28,21 @@ public class SaveUserUseCase {
 
     userRepository.save(user);
     return "Usuario creado exitosamente";
+  }
+
+  private void validateUserName(NewUserRequest newUser) {
+    if (newUser.username().length() < 3) {
+      throw new InvalidNewUserException("El nombre de usuario debe tener al menos tres caracteres");
+    } else if (newUser.username().length() > 20) {
+      throw new InvalidNewUserException("El nombre de usuario no debe superar los 20 caracteres");
+    }
+  }
+
+  private void validateUserPassword(NewUserRequest newUser) {
+    if (newUser.password().length() < 6) {
+      throw new InvalidNewUserException("La contraseña debe contener al menos 6 caracteres");
+    } else if (newUser.password().length() > 20) {
+      throw new InvalidNewUserException("La contraseña no puede superar los 20 caracteres");
+    }
   }
 }
