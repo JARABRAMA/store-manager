@@ -1,5 +1,6 @@
 package com.jarabrama.store_manager.authentication.usecases;
 
+import com.jarabrama.store_manager.authentication.domain.SessionRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
 import com.jarabrama.store_manager.authentication.presentation.dto.LoginRequest;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class LoginUseCase {
   private final SystemUserRepositoryPort userRepo;
   private final PasswordEncoder passwordEncoder;
+  private final SessionRepositoryPort sessionRepo;
 
   public LoginResponse execute(LoginRequest request) {
     var user = userRepo.findByUsername(request.username())
@@ -21,9 +23,11 @@ public class LoginUseCase {
     var correctPassword = passwordEncoder.matches(request.password(),
             user.getPasswordHash());
 
-    if(!correctPassword) {
+    if (!correctPassword) {
       throw new InvalidCredentialsException("Credenciales incorrectas");
     }
+
+    sessionRepo.revokeAllByUser(user.getId());
 
     return null;
   }
