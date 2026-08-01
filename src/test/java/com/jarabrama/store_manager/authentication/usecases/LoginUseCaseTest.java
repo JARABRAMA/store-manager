@@ -1,5 +1,6 @@
 package com.jarabrama.store_manager.authentication.usecases;
 
+import com.jarabrama.store_manager.authentication.domain.SessionRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
 import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
@@ -12,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
@@ -24,6 +26,9 @@ class LoginUseCaseTest {
 
   @Mock
   private PasswordEncoder passwordEncoder;
+
+  @Mock
+  private SessionRepositoryPort sessionRepo;
 
   @InjectMocks
   private LoginUseCase loginUseCase;
@@ -65,5 +70,22 @@ class LoginUseCaseTest {
     var ex = assertThrows(InvalidCredentialsException.class, () -> loginUseCase.execute(request));
     assertEquals("Credenciales incorrectas", ex.getMessage());
   }
+
+  @Test
+  void verify_revoke_all_sessions_by_user() {
+    var userId = UUID.randomUUID();
+    var request = new LoginRequest("admin", "admin");
+    var user = SystemUser.builder()
+            .passwordHash("admin")
+            .id(userId)
+            .username("admin").build();
+
+    when(userRepo.findByUsername(request.username())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(request.password(), user.getPasswordHash())).thenReturn(true);
+
+    loginUseCase.execute(request);
+    verify(sessionRepo).revokeAllByUser(userId);
+  }
+
 
 }
