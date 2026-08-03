@@ -5,6 +5,7 @@ import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPor
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
 import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
 import com.jarabrama.store_manager.authentication.presentation.dto.LoginRequest;
+import com.jarabrama.store_manager.authentication.service.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,6 +31,9 @@ class LoginUseCaseTest {
   @Mock
   private SessionRepositoryPort sessionRepo;
 
+  @Mock
+  private JwtService jwtService;
+
   @InjectMocks
   private LoginUseCase loginUseCase;
 
@@ -40,7 +44,7 @@ class LoginUseCaseTest {
 
   @Test
   void check_it_actually_search_user_by_username() {
-    var request = new LoginRequest("admin", "admin");
+    var request = LoginRequest.builder().username("admin").password("admin").build();
     try {
       loginUseCase.execute(request);
       verify(userRepo).findByUsername("admin");
@@ -51,7 +55,7 @@ class LoginUseCaseTest {
 
   @Test
   void if_user_not_found_by_username_should_throw_invalid_credentials() {
-    var request = new LoginRequest("admin", "admin");
+    var request = LoginRequest.builder().username("admin").password("admin").build();
     when(userRepo.findByUsername(request.username())).thenReturn(Optional.empty());
 
     var ex = assertThrows(InvalidCredentialsException.class, () -> loginUseCase.execute(request));
@@ -60,7 +64,7 @@ class LoginUseCaseTest {
 
   @Test
   void if_user_password_does_not_match_password_should_throw_invalid_credentials() {
-    var request = new LoginRequest("admin", "admin");
+    var request = LoginRequest.builder().username("admin").password("admin").build();
     var user = SystemUser.builder()
             .passwordHash("admin")
             .username("admin").build();
@@ -74,7 +78,7 @@ class LoginUseCaseTest {
   @Test
   void verify_revoke_all_sessions_by_user() {
     var userId = UUID.randomUUID();
-    var request = new LoginRequest("admin", "admin");
+    var request = LoginRequest.builder().username("admin").password("admin").build();
     var user = SystemUser.builder()
             .passwordHash("admin")
             .id(userId)
