@@ -1,6 +1,8 @@
 package com.jarabrama.store_manager.authentication.domain.model;
 
 import com.jarabrama.store_manager.authentication.domain.exceptions.AuthTokenException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,17 +17,26 @@ import java.util.UUID;
 @Builder
 @Data
 public class AuthToken {
-  private static final Duration ACCESS_TOKEN_TIMEOUT = Duration.ofMinutes(5);
-  private static final Duration NOT_TRUSTED_REFRESH_TOKEN_TIMEOUT = Duration.ofMinutes(15);
-  private static final Duration TRUSTED_REFRESH_TOKEN_TIMEOUT = Duration.ofDays(5);
 
-  private final UUID id;
-  private final String tokenHash;
-  private final UUID userId;
-  private final AuthTokenType tokenType;
+  private  UUID id;
+  private  String tokenHash;
+  private  UUID userId;
+  private  AuthTokenType tokenType;
   private Instant createdAt;
   private Instant expiresAt;
   private boolean revoked;
+
+
+  public static AuthToken fromTokenClaims(Claims claims) {
+    return AuthToken.builder()
+            .createdAt(claims.getIssuedAt().toInstant())
+            .expiresAt(claims.getExpiration().toInstant())
+            .revoked(false)
+            .tokenType(AuthTokenType.valueOf(claims.get("tokenType", String.class)))
+            .build();
+  }
+
+
 
 
 }
