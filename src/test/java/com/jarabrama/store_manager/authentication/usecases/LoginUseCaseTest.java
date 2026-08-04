@@ -3,9 +3,13 @@ package com.jarabrama.store_manager.authentication.usecases;
 import com.jarabrama.store_manager.authentication.domain.SessionRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
+import com.jarabrama.store_manager.authentication.domain.model.AuthTokenType;
+import com.jarabrama.store_manager.authentication.domain.model.SystemRole;
 import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
 import com.jarabrama.store_manager.authentication.presentation.dto.LoginRequest;
 import com.jarabrama.store_manager.authentication.service.JwtService;
+import com.jarabrama.store_manager.authentication.service.model.NewJwtTokenRequest;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,12 +17,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 class LoginUseCaseTest {
 
@@ -77,6 +82,19 @@ class LoginUseCaseTest {
 
   @Test
   void verify_revoke_all_sessions_by_user() {
+    // existing setup...
+    when(jwtService.generateToken(any(NewJwtTokenRequest.class))).thenReturn("fake-token-hash");
+
+    var mockClaims = mock(Claims.class);
+    when(mockClaims.getIssuedAt()).thenReturn(new Date());
+    when(mockClaims.getExpiration()).thenReturn(new Date(System.currentTimeMillis() + 100000));
+    when(mockClaims.getSubject()).thenReturn("someUsername");
+    when(mockClaims.get("userRole", String.class)).thenReturn(SystemRole.EMPLOYEE.toString());
+    when(mockClaims.get("tokenType", String.class)).thenReturn(AuthTokenType.ACCESS.toString());
+    // stub whatever other claims AuthToken.fromTokenClaims reads
+
+    when(jwtService.getClaimsFromToken(anyString())).thenReturn(mockClaims);
+
     var userId = UUID.randomUUID();
     var request = LoginRequest.builder().username("admin").password("admin").build();
     var user = SystemUser.builder()
