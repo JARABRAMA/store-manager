@@ -82,7 +82,6 @@ class LoginUseCaseTest {
 
   @Test
   void verify_revoke_all_sessions_by_user() {
-    // existing setup...
     when(jwtService.generateToken(any(NewJwtTokenRequest.class))).thenReturn("fake-token-hash");
 
     var mockClaims = mock(Claims.class);
@@ -91,7 +90,6 @@ class LoginUseCaseTest {
     when(mockClaims.getSubject()).thenReturn("someUsername");
     when(mockClaims.get("userRole", String.class)).thenReturn(SystemRole.EMPLOYEE.toString());
     when(mockClaims.get("tokenType", String.class)).thenReturn(AuthTokenType.ACCESS.toString());
-    // stub whatever other claims AuthToken.fromTokenClaims reads
 
     when(jwtService.getClaimsFromToken(anyString())).thenReturn(mockClaims);
 
