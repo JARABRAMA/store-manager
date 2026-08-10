@@ -20,14 +20,13 @@ public class JwtService {
   private String secretKey;
 
   public String generateToken(NewJwtTokenRequest req) {
-    var expirationDate = Date.from(Instant.now().plus(req.expirationTimeout()));
     var extraClaims = getClaimsFromNewJwtTokenRequest(req);
 
     return Jwts.builder()
             .claims(extraClaims)
             .subject(req.username())
             .issuedAt(new Date(System.currentTimeMillis()))
-            .expiration(expirationDate)
+            .expiration(Date.from(req.expirationTime()))
             .signWith(getSignInKey())
             .compact();
   }

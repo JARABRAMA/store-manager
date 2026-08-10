@@ -1,6 +1,5 @@
 package com.jarabrama.store_manager.authentication.service;
 
-import com.jarabrama.store_manager.TestUtils;
 import com.jarabrama.store_manager.authentication.domain.model.AuthTokenType;
 import com.jarabrama.store_manager.authentication.domain.model.SystemRole;
 import com.jarabrama.store_manager.authentication.service.model.NewJwtTokenRequest;
@@ -13,6 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+
 import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.Instant;
@@ -20,7 +22,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class JwtServiceTest {
   private JwtService jwtService;
@@ -42,9 +45,9 @@ class JwtServiceTest {
             .username("user")
             .tokenType(AuthTokenType.ACCESS)
             .userRole(SystemRole.ADMINISTRATOR)
-            .expirationTimeout(Duration.ofMinutes(4))
             .sessionId(UUID.randomUUID())
             .trustedDeviceId(UUID.randomUUID())
+            .expirationTime(Instant.now().plus(Duration.ofMinutes(4)))
             .build();
   }
 
@@ -98,15 +101,14 @@ class JwtServiceTest {
   @Test
   @DisplayName("generateToken with new token jwt token request null fields")
   void generateToken_withNewToken_null_fields() {
+    var expirationTime = Instant.now().plus(Duration.ofMinutes(5));
     var request = NewJwtTokenRequest.builder().username("user")
             .userRole(SystemRole.ADMINISTRATOR)
             .tokenType(AuthTokenType.ACCESS)
-            .expirationTimeout(Duration.ofMinutes(5))
+            .expirationTime(expirationTime)
             .build();
 
-    var before = Instant.now();
     var token = jwtService.generateToken(request);
-    var after = Instant.now();
 
     assertThat(token).isNotNull();
     var claims = parseClaims(token);
@@ -117,20 +119,18 @@ class JwtServiceTest {
     assertNull(claims.get("sessionId", String.class));
     assertNull(claims.get("trustedDeviceId", String.class));
 
-    assertTrue(TestUtils.isBetweenToDates(claims.getExpiration().toInstant(),
-            before.plus(Duration.ofMinutes(5)).minusSeconds(1),
-            after.plus(Duration.ofMinutes(5)).plusSeconds(1)));
-
+    assertEquals(expirationTime.truncatedTo(ChronoUnit.SECONDS), claims.getExpiration().toInstant());
   }
 
 
   @Test
   void getClaimsFrom_Token() {
+    var expirationTime = Instant.now().plus(Duration.ofMinutes(5));
     var req = NewJwtTokenRequest.builder()
             .username("user")
             .tokenType(AuthTokenType.ACCESS)
             .userRole(SystemRole.ADMINISTRATOR)
-            .expirationTimeout(Duration.ofMinutes(5))
+            .expirationTime(expirationTime)
             .build();
 
     var token =  jwtService.generateToken(req);
