@@ -38,10 +38,9 @@ public class CreateRefreshTokenUseCase {
    *
    * @param user           the user the token belongs to
    * @param trustedDeviceId the id of the trusted device, or {@code null} when the device is not trusted
-   * @param sessionId      the id of the session the token belongs to
    * @return the persisted {@link AuthToken} representing the refresh token
    */
-  public AuthToken execute(SystemUser user, UUID trustedDeviceId, UUID sessionId) {
+  public AuthToken execute(SystemUser user, UUID trustedDeviceId) {
     var now = Instant.now();
     var token = AuthToken.builder()
             .userId(user.getId())
@@ -56,7 +55,7 @@ public class CreateRefreshTokenUseCase {
       token.setExpiresAt(now.plus(NOT_TRUSTED_DEVICE_EXPIRATION_TIMEOUT));
     }
 
-    token.setTokenHash(generateTokenHash(user, trustedDeviceId, sessionId, token));
+    token.setTokenHash(generateTokenHash(user, trustedDeviceId, token));
 
     return authTokenRepo.save(token);
   }
@@ -66,11 +65,10 @@ public class CreateRefreshTokenUseCase {
    *
    * @return the generated JWT string
    */
-  private String generateTokenHash(SystemUser user, UUID trustedDeviceId, UUID sessionId, AuthToken token) {
+  private String generateTokenHash(SystemUser user, UUID trustedDeviceId,  AuthToken token) {
     var jwtTokenRequest = NewJwtTokenRequest.builder()
             .username(user.getUsername())
             .userRole(user.getRole())
-            .sessionId(sessionId)
             .trustedDeviceId(trustedDeviceId)
             .tokenType(AuthTokenType.REFRESH)
             .expirationTime(token.getExpiresAt())

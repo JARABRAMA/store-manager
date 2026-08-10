@@ -8,6 +8,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Builder
-public record NewJwtTokenRequest(String username, SystemRole userRole, UUID sessionId, UUID trustedDeviceId,
+public record NewJwtTokenRequest(String username, SystemRole userRole,  UUID trustedDeviceId,
                                  AuthTokenType tokenType, Instant expirationTime) {
 }

@@ -45,7 +45,6 @@ class JwtServiceTest {
             .username("user")
             .tokenType(AuthTokenType.ACCESS)
             .userRole(SystemRole.ADMINISTRATOR)
-            .sessionId(UUID.randomUUID())
             .trustedDeviceId(UUID.randomUUID())
             .expirationTime(Instant.now().plus(Duration.ofMinutes(4)))
             .build();
@@ -78,7 +77,6 @@ class JwtServiceTest {
     Claims claims = parseClaims(jwtService.generateToken(req));
 
     assertThat(claims.get("userRole", String.class)).isEqualTo(req.userRole().toString());
-    assertThat(claims.get("sessionId", String.class)).isEqualTo(req.sessionId().toString());
     assertThat(claims.get("trustedDeviceId", String.class)).isEqualTo(req.trustedDeviceId().toString());
     assertThat(claims.get("tokenType", String.class)).isEqualTo(req.tokenType().toString());
   }
@@ -116,7 +114,6 @@ class JwtServiceTest {
     assertEquals(request.username(), claims.get("sub", String.class));
     assertEquals(SystemRole.ADMINISTRATOR.toString(), claims.get("userRole", String.class));
     assertEquals(AuthTokenType.ACCESS.toString(), claims.get("tokenType", String.class));
-    assertNull(claims.get("sessionId", String.class));
     assertNull(claims.get("trustedDeviceId", String.class));
 
     assertEquals(expirationTime.truncatedTo(ChronoUnit.SECONDS), claims.getExpiration().toInstant());
@@ -139,7 +136,6 @@ class JwtServiceTest {
     assertEquals(req.username(), claims.getSubject());
     assertEquals(SystemRole.ADMINISTRATOR.toString(), claims.get("userRole", String.class));
     assertEquals(AuthTokenType.ACCESS.toString(), claims.get("tokenType", String.class));
-    assertNull(claims.get("sessionId", String.class));
     assertNull(claims.get("trustedDeviceId", String.class));
 
   }

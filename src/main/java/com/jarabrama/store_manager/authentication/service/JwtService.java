@@ -34,7 +34,6 @@ public class JwtService {
   private HashMap<String, String> getClaimsFromNewJwtTokenRequest(NewJwtTokenRequest req) {
     var extraClaims = new HashMap<String, String>();
     extraClaims.put("userRole", req.userRole().toString());
-    extraClaims.put("sessionId", req.sessionId() != null ? req.sessionId().toString() : null);
     extraClaims.put("trustedDeviceId", req.trustedDeviceId() != null ? req.trustedDeviceId().toString() : null);
     extraClaims.put("tokenType", req.tokenType().toString());
     return extraClaims;

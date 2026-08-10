@@ -57,7 +57,6 @@ class CreateNewAccessTokenUseCaseTest {
     verify(jwtService).generateToken(argThat(request -> request.username().equals(user.getUsername()) &&
             request.userRole().equals(SystemRole.EMPLOYEE) &&
             request.tokenType().equals(AuthTokenType.ACCESS) &&
-            request.sessionId() == null &&
             request.trustedDeviceId() == null));
   }
 
