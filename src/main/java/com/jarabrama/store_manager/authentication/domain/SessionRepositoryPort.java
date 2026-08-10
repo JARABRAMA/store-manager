@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface SessionRepositoryPort {
   void revokeAllByUser(UUID userId);
+  Session save(Session session);
 }
