@@ -26,17 +26,4 @@ public class AuthToken {
   private Instant expiresAt;
   private boolean revoked;
 
-
-  public static AuthToken fromTokenClaims(Claims claims) {
-    return AuthToken.builder()
-            .createdAt(claims.getIssuedAt().toInstant())
-            .expiresAt(claims.getExpiration().toInstant())
-            .revoked(false)
-            .tokenType(AuthTokenType.valueOf(claims.get("tokenType", String.class)))
-            .build();
-  }
-
-
-
-
 }
