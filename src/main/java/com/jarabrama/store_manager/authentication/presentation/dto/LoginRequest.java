@@ -7,7 +7,6 @@ public record LoginRequest(
         String username,
         String password,
         String deviceHash,
-        boolean trustedDevice,
-        String deviceLabel
+        boolean trustedDevice
 ) {
 }
