@@ -85,8 +85,16 @@ token.
 - Given: the user is logged in
 - And: the access token has expired
 - When: the user requests a refresh with a refresh token that is expired or revoked
-- Then: the system returns HTTP 401 Unauthorized
-- And: a message telling the user to log in again
+- Then: the system throws an `AuthenticationException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in again
+
+### Scenario: The refresh token is not signed with the expected secret
+
+- Given: the user requests a refresh of the access token
+- And: the presented refresh token was not signed with the expected secret key
+- When: the system tries to validate the token's signature
+- Then: the system throws an `AuthenticationException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in again
 
 ### Acceptance criteria
 
@@ -96,6 +104,9 @@ token.
 3. On success: the session's `lastActivityAt` and `expiresAt` are updated.
 4. The presented token must be of type `REFRESH`, belong to an existing
    non-revoked session, and be neither expired nor revoked.
-5. On expired, revoked or otherwise invalid tokens: HTTP 401 with a message such as
+5. The token signature is verified first; a token not signed with the expected
+   secret key must be rejected with HTTP 401.
+6. On expired, revoked or otherwise invalid tokens: the system throws an
+   `AuthenticationException` and responds with HTTP 401 with a message such as
    "Session expired, please log in again".
-6. Revoked refresh tokens must not be reusable.
+7. Revoked refresh tokens must not be reusable.
