@@ -80,6 +80,15 @@ token.
 - And: the refresh token remains unchanged
 - And: the session is extended
 
+### Scenario: User sends a token that is not a refresh token
+
+- Given: the user is logged in 
+- And: the access token has expired
+- When: the user request a refresh of his access token 
+- And: sends a token that is not a refresh token 
+- Then: throws and exception `AuthenticationException`
+- And: response with HTTP 401 unauthorized, prompting the user to log in again.
+
 ### Scenario: User refreshes with an expired or revoked refresh token
 
 - Given: the user is logged in
