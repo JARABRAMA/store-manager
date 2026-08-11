@@ -17,4 +17,8 @@ public class Session {
   private Instant expiresAt;
   private boolean revoked;
   private AuthToken refreshToken;
+
+  public boolean isValid() {
+    return !isRevoked() && expiresAt != null && expiresAt.isAfter(Instant.now());
+  }
 }

@@ -34,6 +34,22 @@ is reused; no new token is issued.
 - Then: the system extends the refresh token and session expiration by 15 minutes
   from the moment of the request
 
+### Scenario: User has no session in the system
+
+- Given: the user makes a request to the system
+- And: the system attempts to extend the user's session
+- When: there are no registered sessions for the user
+- Then: the system throws a `SessionException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in
+
+### Scenario: The user's last session has expired or been revoked
+
+- Given: the user makes a request to the system
+- And: the system attempts to extend the user's session
+- When: the last session is expired or revoked
+- Then: the system throws a `SessionException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in
+
 ### Acceptance criteria
 
 1. Extension is triggered on every authenticated request (via a security filter or
@@ -45,8 +61,9 @@ is reused; no new token is issued.
 4. Extension recomputes the token `expiresAt` as `now + timeout` according to the
    trust level, and updates the session `lastActivityAt` to `now` and its
    `expiresAt` to the new token expiration.
-5. If the session has no valid refresh token, no extension happens and the request
-   is treated as unauthenticated.
+5. If the user has no registered session, or the last session is expired or
+   revoked, the system throws a `SessionException` and responds with HTTP 401
+   Unauthorized, prompting the user to log in again. No extension is performed.
 
 ## Feature: Refresh token
 
@@ -63,13 +80,37 @@ token.
 - And: the refresh token remains unchanged
 - And: the session is extended
 
+### Scenario: User sends a token that is not a refresh token
+
+- Given: the user is logged in 
+- And: the access token has expired
+- When: the user request a refresh of his access token 
+- And: sends a token that is not a refresh token 
+- Then: throws and exception `AuthenticationException`
+- And: response with HTTP 401 unauthorized, prompting the user to log in again.
+
 ### Scenario: User refreshes with an expired or revoked refresh token
 
 - Given: the user is logged in
 - And: the access token has expired
 - When: the user requests a refresh with a refresh token that is expired or revoked
-- Then: the system returns HTTP 401 Unauthorized
-- And: a message telling the user to log in again
+- Then: the system throws an `AuthenticationException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in again
+
+### Scenario: The refresh token is not signed with the expected secret
+
+- Given: the user requests a refresh of the access token
+- And: the presented refresh token was not signed with the expected secret key
+- When: the system tries to validate the token's signature
+- Then: the system throws an `AuthenticationException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in again
+
+### Scenario: The refresh token does not belong to any user
+- Given: the user request a refresh of the access token
+- And: the present refresh token is signed, not expired and not revoked
+- When: the refresh token does not belong to any user in system
+- Then: throws an `AuthenticationException`
+- And: System response with HTTP 401 unauthorized, prompting the user to log in again
 
 ### Acceptance criteria
 
@@ -79,6 +120,9 @@ token.
 3. On success: the session's `lastActivityAt` and `expiresAt` are updated.
 4. The presented token must be of type `REFRESH`, belong to an existing
    non-revoked session, and be neither expired nor revoked.
-5. On expired, revoked or otherwise invalid tokens: HTTP 401 with a message such as
+5. The token signature is verified first; a token not signed with the expected
+   secret key must be rejected with HTTP 401.
+6. On expired, revoked or otherwise invalid tokens: the system throws an
+   `AuthenticationException` and responds with HTTP 401 with a message such as
    "Session expired, please log in again".
-6. Revoked refresh tokens must not be reusable.
+7. Revoked refresh tokens must not be reusable.

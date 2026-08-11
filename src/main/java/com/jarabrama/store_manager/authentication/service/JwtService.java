@@ -1,7 +1,6 @@
 package com.jarabrama.store_manager.authentication.service;
 
- import com.jarabrama.store_manager.authentication.service.model.NewJwtTokenRequest;
-import io.jsonwebtoken.Claims;
+import com.jarabrama.store_manager.authentication.service.model.NewJwtTokenRequest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -44,11 +42,12 @@ public class JwtService {
     return Keys.hmacShaKeyFor(bites);
   }
 
-  public Claims getClaimsFromToken(String token) {
-    return Jwts.parser()
-            .verifyWith(getSignInKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
+  public boolean isSinged(String tokenHash) {
+    try {
+      Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(tokenHash);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 }
