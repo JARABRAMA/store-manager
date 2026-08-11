@@ -96,6 +96,13 @@ token.
 - Then: the system throws an `AuthenticationException`
 - And: responds with HTTP 401 Unauthorized, prompting the user to log in again
 
+### Scenario: The refresh token does not belong to any user
+- Given: the user request a refresh of the access token
+- And: the present refresh token is signed, not expired and not revoked
+- When: the refresh token does not belong to any user in system
+- Then: throws an `AuthenticationException`
+- And: System response with HTTP 401 unauthorized, prompting the user to log in again
+
 ### Acceptance criteria
 
 1. Endpoint: `POST /api/auth/refresh` receiving the refresh token in the request.
