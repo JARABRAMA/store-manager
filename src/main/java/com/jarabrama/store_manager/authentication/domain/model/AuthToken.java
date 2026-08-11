@@ -26,4 +26,8 @@ public class AuthToken {
   private Instant expiresAt;
   private boolean revoked;
 
+  public boolean isValid() {
+    return !revoked && expiresAt.isAfter(Instant.now());
+  }
+
 }
