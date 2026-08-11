@@ -34,6 +34,22 @@ is reused; no new token is issued.
 - Then: the system extends the refresh token and session expiration by 15 minutes
   from the moment of the request
 
+### Scenario: User has no session in the system
+
+- Given: the user makes a request to the system
+- And: the system attempts to extend the user's session
+- When: there are no registered sessions for the user
+- Then: the system throws a `SessionException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in
+
+### Scenario: The user's last session has expired or been revoked
+
+- Given: the user makes a request to the system
+- And: the system attempts to extend the user's session
+- When: the last session is expired or revoked
+- Then: the system throws a `SessionException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in
+
 ### Acceptance criteria
 
 1. Extension is triggered on every authenticated request (via a security filter or
@@ -45,8 +61,9 @@ is reused; no new token is issued.
 4. Extension recomputes the token `expiresAt` as `now + timeout` according to the
    trust level, and updates the session `lastActivityAt` to `now` and its
    `expiresAt` to the new token expiration.
-5. If the session has no valid refresh token, no extension happens and the request
-   is treated as unauthenticated.
+5. If the user has no registered session, or the last session is expired or
+   revoked, the system throws a `SessionException` and responds with HTTP 401
+   Unauthorized, prompting the user to log in again. No extension is performed.
 
 ## Feature: Refresh token
 
