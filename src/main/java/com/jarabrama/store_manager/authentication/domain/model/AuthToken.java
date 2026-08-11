@@ -1,14 +1,10 @@
 package com.jarabrama.store_manager.authentication.domain.model;
 
-import com.jarabrama.store_manager.authentication.domain.exceptions.AuthTokenException;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
