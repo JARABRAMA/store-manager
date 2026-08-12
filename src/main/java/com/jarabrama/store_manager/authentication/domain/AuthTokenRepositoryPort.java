@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface AuthTokenRepositoryPort {
   AuthToken save(AuthToken authToken);
   void updateExpirationTimeout(UUID id, Instant newExpirationTimeout);
+  void revokeAllByUser(UUID userId);
 }
