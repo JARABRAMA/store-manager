@@ -74,6 +74,6 @@ class LogoutUseCaseTest {
     buildUser();
     when(userRepo.findById(this.user.getId())).thenReturn(Optional.of(this.user));
 
-    verify(authTokenRepo).revokeAllByUser(user.getId())
+    verify(authTokenRepo).revokeAllByUser(user.getId());
   }
 }
