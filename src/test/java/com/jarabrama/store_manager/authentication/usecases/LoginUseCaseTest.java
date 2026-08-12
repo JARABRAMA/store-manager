@@ -1,5 +1,6 @@
 package com.jarabrama.store_manager.authentication.usecases;
 
+import com.jarabrama.store_manager.authentication.domain.AuthTokenRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SessionRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
@@ -47,6 +48,9 @@ class LoginUseCaseTest {
 
   @Mock
   private CreateAndSaveNewSessionUseCase createAndSaveNewSessionUseCase;
+
+  @Mock
+  private AuthTokenRepositoryPort authTokenRepo;
 
   @InjectMocks
   private LoginUseCase loginUseCase;
@@ -115,6 +119,17 @@ class LoginUseCaseTest {
     loginUseCase.execute(buildRequest(false));
 
     verify(sessionRepo).revokeAllByUser(user.getId());
+  }
+
+  @Test
+  @DisplayName("When credentials are valid should revoke all user auth tokens")
+  void verify_revoke_all_user_tokens() {
+    when(createNewAccessTokenUseCase.execute(user)).thenReturn(buildToken("access-hash", AuthTokenType.ACCESS));
+    when(createRefreshTokenUseCase.execute(eq(user), isNull())).thenReturn(buildToken("refresh-hash", AuthTokenType.REFRESH));
+
+    loginUseCase.execute(buildRequest(false));
+
+    verify(authTokenRepo).revokeAllByUser(user.getId());
   }
 
   @Test

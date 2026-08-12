@@ -1,5 +1,6 @@
 package com.jarabrama.store_manager.authentication.usecases;
 
+import com.jarabrama.store_manager.authentication.domain.AuthTokenRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SessionRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPort;
 import com.jarabrama.store_manager.authentication.domain.exceptions.InvalidCredentialsException;
@@ -26,6 +27,7 @@ public class LoginUseCase {
   private final SystemUserRepositoryPort userRepo;
   private final PasswordEncoder passwordEncoder;
   private final SessionRepositoryPort sessionRepo;
+  private final AuthTokenRepositoryPort  authTokenRepo;
 
   private final CreateNewAccessTokenUseCase createNewAccessTokenUseCase;
   private final CreateRefreshTokenUseCase createRefreshTokenUseCase;
@@ -50,6 +52,7 @@ public class LoginUseCase {
   public LoginResponse execute(LoginRequest request) {
     var user = getUserAndValidateCredentials(request);
     sessionRepo.revokeAllByUser(user.getId());
+    authTokenRepo.revokeAllByUser(user.getId());
 
     TrustedDevice trustedDevice = null;
     if (request.trustedDevice()) {
