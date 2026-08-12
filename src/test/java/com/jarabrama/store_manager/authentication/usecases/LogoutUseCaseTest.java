@@ -5,7 +5,6 @@ import com.jarabrama.store_manager.authentication.domain.SystemUserRepositoryPor
 import com.jarabrama.store_manager.authentication.domain.exceptions.AuthException;
 import com.jarabrama.store_manager.authentication.domain.model.SystemRole;
 import com.jarabrama.store_manager.authentication.domain.model.SystemUser;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,8 @@ import org.mockito.MockitoAnnotations;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
