@@ -126,3 +126,33 @@ token.
    `AuthenticationException` and responds with HTTP 401 with a message such as
    "Session expired, please log in again".
 7. Revoked refresh tokens must not be reusable.
+
+## Feature: Log out
+
+Allows a user to end their session by revoking all of their active sessions, so
+that their refresh tokens can no longer be used.
+
+### Scenario: The user id is not found in the system
+
+- Given: the user sends a logout request with a user id
+- When: the user id is not present in the system
+- Then: the system throws an `AuthException`
+- And: responds with HTTP 401 Unauthorized, prompting the user to log in
+
+### Scenario: The user id is valid
+
+- Given: the user is logged in
+- When: the user makes a logout request
+- And: the user id is present in the system
+- Then: all of the user's sessions are revoked
+- And: the system confirms the logout so the user can be redirected to log in
+
+### Acceptance criteria
+
+1. Endpoint: `POST /api/auth/logout` receiving the user id in the request.
+2. The user id must exist in the system; otherwise the system throws an
+   `AuthException` and responds with HTTP 401, prompting the user to log in again.
+3. On success, all of the user's sessions are revoked through the session
+   repository, so their refresh tokens can no longer be used.
+4. The access token is a short-lived stateless JWT and is not revoked; it remains
+   valid until its 5-minute expiry.
