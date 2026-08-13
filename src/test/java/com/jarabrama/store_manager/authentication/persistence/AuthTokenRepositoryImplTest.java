@@ -113,11 +113,33 @@ class AuthTokenRepositoryImplTest {
     verify(jpaRepo).save(captor.capture());
     assertEquals(user, captor.getValue().getUser());
     assertEquals(token.getId(), saved.getId());
+    assertEquals(token.getUserId(), saved.getUserId());
     assertEquals(token.getTokenHash(), saved.getTokenHash());
     assertEquals(token.getTokenType(), saved.getTokenType());
     assertEquals(token.getCreatedAt(), saved.getCreatedAt());
     assertEquals(token.getExpiresAt(), saved.getExpiresAt());
     assertEquals(token.isRevoked(), saved.isRevoked());
+  }
+
+  @Test
+  @DisplayName("When update expiration timeout then delegate to jpa repo")
+  void when_update_expiration_timeout_then_delegates_to_jpa_repo() {
+    var id = UUID.randomUUID();
+    var newExpirationTimeout = Instant.now().plus(Duration.ofHours(1));
+
+    sut.updateExpirationTimeout(id, newExpirationTimeout);
+
+    verify(jpaRepo).updateExpiresAt(newExpirationTimeout, id);
+  }
+
+  @Test
+  @DisplayName("When revoke all tokens by user then delegate to jpa repo")
+  void when_revoke_all_by_user_then_delegates_to_jpa_repo() {
+    var userId = UUID.randomUUID();
+
+    sut.revokeAllByUser(userId);
+
+    verify(jpaRepo).revokeAllByUser(userId);
   }
 
 }

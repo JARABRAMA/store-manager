@@ -20,7 +20,7 @@ public class AuthTokenEntityMapper {
   public AuthToken toDomain(AuthTokenEntity authTokenEntity) {
     return AuthToken.builder()
             .id(authTokenEntity.getId())
-            .userId(authTokenEntity.getId())
+            .userId(authTokenEntity.getUser().getId())
             .tokenHash(authTokenEntity.getTokenHash())
             .tokenType(authTokenEntity.getTokenType())
             .revoked(authTokenEntity.isRevoked())
