@@ -40,9 +40,4 @@ public class AuthTokenEntity {
 
   @Column
   private boolean revoked;
-
-  @PrePersist
-  void prePersists() {
-    this.createdAt = Instant.now();
-  }
 }

@@ -5,7 +5,7 @@ package com.jarabrama.store_manager.authentication.domain.exceptions;
  */
 public class UserNotFoundException extends RuntimeException {
 
-  UserNotFoundException(String message) {
+  public UserNotFoundException(String message) {
     super(message);
   }
 }
